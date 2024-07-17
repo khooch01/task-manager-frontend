@@ -1,23 +1,32 @@
 import React, { useState } from 'react';
-import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 
-const LoginForm = () => {
+const LoginForm = ({ setUser }) => {
     const [username, setUsername] = useState('');
-    const { login } = useAuth();
+    const [password, setPassword] = useState('');
     const navigate = useNavigate();
 
-    const handleSubmit = (e) => {
+    const handleLogin = (e) => {
         e.preventDefault();
-        login(username);
-        navigate('/tasks');
+        const users = JSON.parse(localStorage.getItem('users')) || [];
+        const user = users.find(u => u.username === username && u.password === password);
+        if (user) {
+            setUser(user);
+            navigate('/tasks');
+        } else {
+            alert('Invalid credentials');
+        }
     };
 
     return (
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleLogin}>
             <div>
-                <label>Username:</label>
-                <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} required />
+                <label>Username: </label>
+                <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} />
+            </div>
+            <div>
+                <label>Password: </label>
+                <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
             </div>
             <button type="submit">Login</button>
         </form>
